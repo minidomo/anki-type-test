@@ -1,16 +1,16 @@
 [project]
 name = "anki-type-test"
 version = "0.1.0"
-description = ""
-authors = [{ name = "JB Ladera", email = "domobaby10@gmail.com" }]
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["mypy (>=1.15.0,<2.0.0)", "aqt[qt6] (>=25.2.1,<26.0.0)", "anki (>=25.2.1,<26.0.0)"]
+dependencies = [
+    "anki>=25.2.1",
+    "aqt>=25.2.1",
+]
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-package-mode = false
+[dependency-groups]
+dev = [
+    "pyright>=1.1.399",
+    "ruff>=0.11.6",
+]
