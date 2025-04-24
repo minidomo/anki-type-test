@@ -30,6 +30,12 @@ def on_typed_answer(self: Reviewer, val: Optional[str]):
         self._showAnswer()
 
 
+def move_to_next_card(self: Reviewer):
+    self._answerCard(self._defaultEase())
+
+
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
 Reviewer._onTypedAnswer = on_typed_answer
+
+Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
