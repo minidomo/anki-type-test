@@ -7,3 +7,6 @@ lint:
 
 format:
     uv run ruff format
+
+install-addon:
+    uv run scripts/anki_addon_import.py
