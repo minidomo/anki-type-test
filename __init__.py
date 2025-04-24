@@ -10,9 +10,14 @@ def strip(val: Optional[str]):
 
 
 def default_ease(self: Reviewer):
+    assert self.card is not None
+    assert self.mw.col is not None
+
     button_count = self.mw.col.sched.answerButtons(self.card)
 
-    if strip(self.typedAnswer) == strip(self.typeCorrect):
+    if self.typedAnswer is not None and strip(self.typedAnswer) == strip(
+        self.typeCorrect
+    ):
         return button_count
 
     return 1
