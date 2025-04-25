@@ -3,9 +3,12 @@ from anki.hooks import wrap
 from aqt import gui_hooks
 from anki.cards import Card
 from typing import Optional
+from datetime import datetime
 
 previous_answer: Optional[str] = None
 previous_user_answer: Optional[str] = None
+start_time = datetime.now()
+end_time = datetime.now()
 
 
 def strip(val: Optional[str]):
@@ -29,9 +32,12 @@ def default_ease(self: Reviewer):
 
 
 def on_typed_answer(self: Reviewer, val: Optional[str]):
+    global end_time
+
     self.typedAnswer = strip(val) or ""
 
     if len(self.typedAnswer) > 0:
+        end_time = datetime.now()
         self._showAnswer()
 
 
@@ -89,19 +95,26 @@ def generate_html_word(correct: str, user: str) -> str:
     return "".join(ret)
 
 
-def show_previous_word(text: str, card: Card, kind: str) -> str:
+def on_card_will_show(text: str, card: Card, kind: str) -> str:
     global previous_answer
     global previous_user_answer
+    global start_time
+    global end_time
 
     if kind != "reviewQuestion":
         return text
 
     if previous_answer is not None and previous_user_answer is not None:
-        return (
-            f"{text}\n<br>\n{generate_html_word(previous_answer, previous_user_answer)}"
-        )
+        duration = end_time - start_time
+        time = f'<span style="font-size: 14px;">({duration.total_seconds():.3f})</span>'
+        return f"{text}\n<br>\n{generate_html_word(previous_answer, previous_user_answer)} {time}"
 
     return text
+
+
+def on_reviewer_did_show_question(card: Card):
+    global start_time
+    start_time = datetime.now()
 
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
@@ -112,4 +125,5 @@ Reviewer._showAnswer = wrap(Reviewer._showAnswer, store_answers)
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
 
 
-gui_hooks.card_will_show.append(show_previous_word)
+gui_hooks.card_will_show.append(on_card_will_show)
+gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
