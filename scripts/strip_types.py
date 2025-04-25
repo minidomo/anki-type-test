@@ -41,13 +41,11 @@ def remove_types(content: str) -> str:
     return astor.to_source(transformed)
 
 
-with open("config.toml", "rb") as filein:
+with open("build.toml", "rb") as filein:
     config = tomllib.load(filein)
 
-    build = config["build"]
-
-    src_path = os.path.join(os.getcwd(), build["src"])
-    dest_path = os.path.join(os.getcwd(), build["dest"])
+    src_path = os.path.join(os.getcwd(), config["src"])
+    dest_path = os.path.join(os.getcwd(), config["dest"])
 
     shutil.rmtree(dest_path, ignore_errors=True)
     shutil.copytree(src_path, dest_path)

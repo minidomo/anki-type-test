@@ -1,0 +1,6 @@
+addon_name = "anki-type-test"
+src = "src"
+dest = "dist"
+
+[package]
+dest = "out"
