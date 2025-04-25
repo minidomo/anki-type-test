@@ -4,3 +4,7 @@ dest = "dist"
 
 [package]
 dest = "out"
+
+[manifest]
+package = "anki-type-test"
+name = "anki-type-test"

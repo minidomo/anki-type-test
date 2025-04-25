@@ -7,6 +7,7 @@ format:
 
 build: format lint
     uv run scripts/strip_types.py
+    uv run scripts/gen_manifest.py
 
 install-addon-copy:
     uv run scripts/install_addon.py
