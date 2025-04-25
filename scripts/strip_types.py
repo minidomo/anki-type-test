@@ -44,10 +44,10 @@ def remove_types(content: str) -> str:
 with open("config.toml", "rb") as filein:
     config = tomllib.load(filein)
 
-    strip_types = config["strip-types"]
+    build = config["build"]
 
-    src_path = os.path.join(os.getcwd(), strip_types["src"])
-    dest_path = os.path.join(os.getcwd(), strip_types["dest"])
+    src_path = os.path.join(os.getcwd(), build["src"])
+    dest_path = os.path.join(os.getcwd(), build["dest"])
 
     shutil.rmtree(dest_path, ignore_errors=True)
     shutil.copytree(src_path, dest_path)

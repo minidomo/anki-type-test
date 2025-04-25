@@ -5,11 +5,16 @@ lint:
 format:
     uv run ruff format
 
-strip-types: format lint
+build: format lint
     uv run scripts/strip_types.py
 
-install-addon:
+install-addon-copy:
     uv run scripts/install_addon.py
 
-install-addon-full: strip-types install-addon
+install-addon: build install-addon-copy
 
+package: build
+    uv run scripts/zip_addon.py
+
+clean:
+    uv run scripts/clean.py out dist

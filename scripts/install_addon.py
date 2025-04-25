@@ -5,7 +5,7 @@ import os
 with open("config.toml", "rb") as filein:
     config = tomllib.load(filein)
 
-    dest_path = os.path.join(os.getcwd(), config["strip-types"]["dest"])
+    dest_path = os.path.join(os.getcwd(), config["build"]["dest"])
     addon_dir = os.path.join(config["anki_addon_dir"], config["addon_name"])
 
     for root, dirs, files in os.walk(addon_dir):

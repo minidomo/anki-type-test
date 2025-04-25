@@ -2,16 +2,15 @@ from aqt.reviewer import Reviewer
 from anki.hooks import wrap
 from aqt import gui_hooks
 from anki.cards import Card
-from typing import Optional
 from datetime import datetime
 
-previous_answer: Optional[str] = None
-previous_user_answer: Optional[str] = None
+previous_answer: str | None = None
+previous_user_answer: str | None = None
 start_time = datetime.now()
 end_time = datetime.now()
 
 
-def strip(val: Optional[str]):
+def strip(val: str | None):
     if val is None:
         return val
     return val.strip()
@@ -31,7 +30,7 @@ def default_ease(self: Reviewer):
     return 1
 
 
-def on_typed_answer(self: Reviewer, val: Optional[str]):
+def on_typed_answer(self: Reviewer, val: str | None):
     global end_time
 
     self.typedAnswer = strip(val) or ""
