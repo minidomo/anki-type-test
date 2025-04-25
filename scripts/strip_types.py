@@ -42,10 +42,10 @@ def remove_types(content: str) -> str:
 
 
 with open("build.toml", "rb") as filein:
-    config = tomllib.load(filein)
+    build = tomllib.load(filein)
 
-    src_path = os.path.join(os.getcwd(), config["src"])
-    dest_path = os.path.join(os.getcwd(), config["dest"])
+    src_path = os.path.join(os.getcwd(), build["src"])
+    dest_path = os.path.join(os.getcwd(), build["dest"])
 
     shutil.rmtree(dest_path, ignore_errors=True)
     shutil.copytree(src_path, dest_path)
