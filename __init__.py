@@ -117,6 +117,14 @@ def on_reviewer_did_show_question(card: Card):
     start_time = datetime.now()
 
 
+def reset_state():
+    global previous_answer
+    global previous_user_answer
+
+    previous_answer = None
+    previous_user_answer = None
+
+
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
 Reviewer._onTypedAnswer = on_typed_answer
@@ -127,3 +135,4 @@ Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
 
 gui_hooks.card_will_show.append(on_card_will_show)
 gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
+gui_hooks.reviewer_will_end.append(reset_state)
