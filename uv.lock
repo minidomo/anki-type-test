@@ -35,6 +35,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "astor" },
     { name = "pyright" },
     { name = "ruff" },
 ]
@@ -47,6 +48,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "astor", specifier = ">=0.8.1" },
     { name = "pyright", specifier = ">=1.1.400" },
     { name = "ruff", specifier = ">=0.11.6" },
 ]
@@ -72,6 +74,15 @@ dependencies = [
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/66/3f/ffa764b5262c8166c84e701cc333a62f8108d8200647be4a8230c1397e3e/aqt-25.02.1-py3-none-any.whl", hash = "sha256:3307c11bd6a9b4588c5890c61bc74b6f574e019dc17f7c7aa8f125e477ded277", size = 4222067, upload_time = "2025-04-17T14:24:30.558Z" },
+]
+
+[[package]]
+name = "astor"
+version = "0.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/21/75b771132fee241dfe601d39ade629548a9626d1d39f333fde31bc46febe/astor-0.8.1.tar.gz", hash = "sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e", size = 35090, upload_time = "2019-12-10T01:50:35.51Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/88/97eef84f48fa04fbd6750e62dcceafba6c63c81b7ac1420856c8dcc0a3f9/astor-0.8.1-py2.py3-none-any.whl", hash = "sha256:070a54e890cefb5b3739d19f30f5a5ec840ffc9c50ffa7d23cc9fc1a38ebbfc5", size = 27488, upload_time = "2019-12-10T01:50:33.628Z" },
 ]
 
 [[package]]
