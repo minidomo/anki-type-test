@@ -65,7 +65,11 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
 
         content = [
             "<style>",
-            ".custom-container {{display: flex; flex-direction: column;}}",
+            ".custom-container {display: flex; flex-direction: column; row-gap: 5px; font-size: 14px;}",
+            ".letter-extra {color: #A2575F;}",
+            ".letter-missing {color: #7F848E;}",
+            ".letter-correct {color: #98C379;}",
+            ".letter-incorrect {color: #E06C75;}",
             "</style>",
             '<div class="custom-container">',
             "\n".join(html_entries),
@@ -73,7 +77,7 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
         ]
         html_str = "\n".join(content)
 
-        return f"{text}\n{html_str}"
+        return f"{text}\n<br>\n{html_str}"
 
     return text
 

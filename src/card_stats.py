@@ -21,32 +21,32 @@ class CardStats:
         content = [
             '<div class="card-stat-entry">',
             self._generate_html_word(self.correct_answer, self.user_answer),
-            f'<span style="font-size: 14px;">({self.duration():.3f})</span>',
+            f"<span>({self.duration():.3f})</span>",
             "</div>",
         ]
 
         return "\n".join(content)
 
     def _generate_html_word(self, correct: str, user: str) -> str:
-        def determine_color(target: str, value: str):
+        def determine_color_class(target: str, value: str):
             # not typed #7F848E
             # extra #A2575F
             # correct #98C379
             # wrong #E06C75
 
             if len(target) == 0:
-                return "#A2575F"
+                return "letter-extra"
 
             if len(value) == 0:
-                return "#7F848E"
+                return "letter-missing"
 
             if target == value:
-                return "#98C379"
+                return "letter-correct"
 
-            return "#E06C75"
+            return "letter-incorrect"
 
-        def create_span(character: str, color: str):
-            return f'<span style="font-size: 14px; color: {color};">{character}</span>'
+        def create_span(character: str, color_class: str):
+            return f'<span class="{color_class}">{character}</span>'
 
         ret: list[str] = []
 
@@ -54,16 +54,18 @@ class CardStats:
         j = 0
 
         while i < len(correct) and j < len(user):
-            ret.append(create_span(correct[i], determine_color(correct[i], user[j])))
+            ret.append(
+                create_span(correct[i], determine_color_class(correct[i], user[j]))
+            )
             i += 1
             j += 1
 
         while i < len(correct):
-            ret.append(create_span(correct[i], determine_color(correct[i], "")))
+            ret.append(create_span(correct[i], determine_color_class(correct[i], "")))
             i += 1
 
         while j < len(user):
-            ret.append(create_span(user[j], determine_color("", user[j])))
+            ret.append(create_span(user[j], determine_color_class("", user[j])))
             j += 1
 
         return "".join(ret)
