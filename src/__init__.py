@@ -3,11 +3,9 @@ from anki.hooks import wrap
 from aqt import gui_hooks
 from anki.cards import Card
 from datetime import datetime
+from .card_stats import CardStatsQueue
 
-previous_answer: str | None = None
-previous_user_answer: str | None = None
-start_time = datetime.now()
-end_time = datetime.now()
+card_stats_queue = CardStatsQueue()
 
 
 def strip(val: str | None):
@@ -17,8 +15,8 @@ def strip(val: str | None):
 
 
 def default_ease(self: Reviewer):
-    assert self.card is not None
-    assert self.mw.col is not None
+    assert self.card
+    assert self.mw.col
 
     button_count = self.mw.col.sched.answerButtons(self.card)
 
@@ -31,12 +29,14 @@ def default_ease(self: Reviewer):
 
 
 def on_typed_answer(self: Reviewer, val: str | None):
-    global end_time
+    global card_stats_queue
 
     self.typedAnswer = strip(val) or ""
 
     if len(self.typedAnswer) > 0:
-        end_time = datetime.now()
+        cur = card_stats_queue.current()
+        assert cur
+        cur.end_time = datetime.now()
         self._showAnswer()
 
 
@@ -45,11 +45,12 @@ def move_to_next_card(self: Reviewer):
 
 
 def store_answers(self: Reviewer):
-    global previous_answer
-    global previous_user_answer
+    global card_stats_queue
 
-    previous_answer = strip(self.typeCorrect)
-    previous_user_answer = strip(self.typedAnswer)
+    cur = card_stats_queue.current()
+    assert cur
+    cur.correct_answer = strip(self.typeCorrect)
+    cur.user_answer = strip(self.typedAnswer)
 
 
 def generate_html_word(correct: str, user: str) -> str:
@@ -95,33 +96,40 @@ def generate_html_word(correct: str, user: str) -> str:
 
 
 def on_card_will_show(text: str, card: Card, kind: str) -> str:
+    global card_stats_queue
     global previous_answer
     global previous_user_answer
-    global start_time
-    global end_time
 
     if kind != "reviewQuestion":
         return text
 
-    if previous_answer is not None and previous_user_answer is not None:
-        duration = end_time - start_time
-        time = f'<span style="font-size: 14px;">({duration.total_seconds():.3f})</span>'
-        return f"{text}\n<br>\n{generate_html_word(previous_answer, previous_user_answer)} {time}"
+    prev = card_stats_queue.previous()
+    if prev is not None:
+        assert prev.correct_answer
+        assert prev.user_answer
+
+        time = f'<span style="font-size: 14px;">({prev.duration():.3f})</span>'
+        return f"{text}\n<br>\n{generate_html_word(prev.correct_answer, prev.user_answer)} {time}"
 
     return text
 
 
 def on_reviewer_did_show_question(card: Card):
-    global start_time
-    start_time = datetime.now()
+    global card_stats_queue
+
+    cur = card_stats_queue.current()
+    assert cur
+    cur.start_time = datetime.now()
 
 
 def reset_state():
-    global previous_answer
-    global previous_user_answer
+    global card_stats_queue
+    card_stats_queue.reset()
 
-    previous_answer = None
-    previous_user_answer = None
+
+def on_next_card(self: Reviewer):
+    global card_stats_queue
+    card_stats_queue.create_new_card_stats()
 
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
@@ -130,6 +138,8 @@ Reviewer._onTypedAnswer = on_typed_answer
 
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, store_answers)
 Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
+
+Reviewer.nextCard = wrap(Reviewer.nextCard, on_next_card, "before")
 
 
 gui_hooks.card_will_show.append(on_card_will_show)
