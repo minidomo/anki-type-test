@@ -3,7 +3,7 @@ from anki.hooks import wrap
 from aqt import gui_hooks
 from anki.cards import Card
 from datetime import datetime
-from .card_stats import CardStatsQueue
+from .card_stats import CardStatsQueue, CardStats
 
 card_stats_queue = CardStatsQueue()
 
@@ -53,63 +53,27 @@ def store_answers(self: Reviewer):
     cur.user_answer = strip(self.typedAnswer)
 
 
-def generate_html_word(correct: str, user: str) -> str:
-    def determine_color(target: str, value: str):
-        # not typed #7F848E
-        # extra #A2575F
-        # correct #98C379
-        # wrong #E06C75
-
-        if len(target) == 0:
-            return "#A2575F"
-
-        if len(value) == 0:
-            return "#7F848E"
-
-        if target == value:
-            return "#98C379"
-
-        return "#E06C75"
-
-    def create_span(character: str, color: str):
-        return f'<span style="font-size: 14px; color: {color};">{character}</span>'
-
-    ret: list[str] = []
-
-    i = 0
-    j = 0
-
-    while i < len(correct) and j < len(user):
-        ret.append(create_span(correct[i], determine_color(correct[i], user[j])))
-        i += 1
-        j += 1
-
-    while i < len(correct):
-        ret.append(create_span(correct[i], determine_color(correct[i], "")))
-        i += 1
-
-    while j < len(user):
-        ret.append(create_span(user[j], determine_color("", user[j])))
-        j += 1
-
-    return "".join(ret)
-
-
 def on_card_will_show(text: str, card: Card, kind: str) -> str:
     global card_stats_queue
-    global previous_answer
-    global previous_user_answer
 
     if kind != "reviewQuestion":
         return text
 
-    prev = card_stats_queue.previous()
-    if prev is not None:
-        assert prev.correct_answer
-        assert prev.user_answer
+    if len(card_stats_queue.queue) > 1:
+        history_entries = card_stats_queue.queue[0 : len(card_stats_queue.queue) - 1]
+        html_entries = map(CardStats.html, reversed(history_entries))
 
-        time = f'<span style="font-size: 14px;">({prev.duration():.3f})</span>'
-        return f"{text}\n<br>\n{generate_html_word(prev.correct_answer, prev.user_answer)} {time}"
+        content = [
+            "<style>",
+            ".custom-container {{display: flex; flex-direction: column;}}",
+            "</style>",
+            '<div class="custom-container">',
+            "\n".join(html_entries),
+            "</div>",
+        ]
+        html_str = "\n".join(content)
+
+        return f"{text}\n{html_str}"
 
     return text
 
