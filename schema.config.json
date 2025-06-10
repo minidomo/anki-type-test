@@ -1,7 +1,7 @@
 {
     "type": "object",
     "properties": {
-        "history_limit": {
+        "stat_display_limit": {
             "type": "number"
         }
     }

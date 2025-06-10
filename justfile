@@ -1,5 +1,7 @@
-lint:
+check-json:
     uv run check-jsonschema --schemafile schema.config.json plugin.config.json src/config.json
+
+lint: check-json
     uv run pyright
     uv run ruff check
 

@@ -101,8 +101,7 @@ def on_next_card(self: Reviewer):
 
 
 def init_state(self: Reviewer):
-    global card_stats_queue
-    card_stats_queue.init_state()
+    pass
 
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)

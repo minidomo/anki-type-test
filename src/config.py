@@ -6,5 +6,5 @@ def _config():
     return cast(dict[str, Any], mw.addonManager.getConfig(__name__))
 
 
-def history_limit() -> int:
-    return _config()["history_limit"]
+def stat_display_limit() -> int:
+    return _config()["stat_display_limit"]
