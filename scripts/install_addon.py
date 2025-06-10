@@ -1,6 +1,12 @@
 import tomllib
 import shutil
 import os
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config", action="store_true")
+
+args = parser.parse_args()
 
 with open("config.toml", "rb") as config_data:
     with open("build.toml", "rb") as build_data:
@@ -17,3 +23,9 @@ with open("config.toml", "rb") as config_data:
                 shutil.rmtree(os.path.join(root, d))
 
         shutil.copytree(dest_path, addon_dir, dirs_exist_ok=True)
+
+        if args.config:
+            shutil.copyfile(
+                os.path.join(os.getcwd(), "plugin.config.json"),
+                os.path.join(addon_dir, "config.json"),
+            )

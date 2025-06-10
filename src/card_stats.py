@@ -1,4 +1,5 @@
 from datetime import datetime
+from . import config
 
 
 class CardStats:
@@ -74,7 +75,7 @@ class CardStats:
 class CardStatsQueue:
     def __init__(self):
         self.queue: list[CardStats] = []
-        self.history_limit = 10
+        self.history_limit = config.history_limit
 
     def create_new_card_stats(self):
         if len(self.queue) == self.history_limit:

@@ -1,0 +1,8 @@
+{
+    "type": "object",
+    "properties": {
+        "history_limit": {
+            "type": "number"
+        }
+    }
+}

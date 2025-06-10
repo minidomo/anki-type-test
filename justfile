@@ -1,4 +1,5 @@
 lint:
+    uv run check-jsonschema --schemafile schema.config.json plugin.config.json src/config.json
     uv run pyright
     uv run ruff check
 
@@ -9,10 +10,8 @@ build: format lint
     uv run scripts/strip_types.py
     uv run scripts/gen_manifest.py
 
-install-addon-copy:
-    uv run scripts/install_addon.py
-
-install-addon: build install-addon-copy
+install-addon *args:
+    uv run scripts/install_addon.py {{args}}
 
 package: build
     uv run scripts/zip_addon.py

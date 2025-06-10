@@ -177,3 +177,4 @@ config.toml
 *.config.toml
 out/
 .temp/
+plugin.config.json
