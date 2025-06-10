@@ -90,14 +90,19 @@ def on_reviewer_did_show_question(card: Card):
     cur.start_time = datetime.now()
 
 
-def reset_state():
+def cleanup():
     global card_stats_queue
-    card_stats_queue.reset()
+    card_stats_queue.cleanup()
 
 
 def on_next_card(self: Reviewer):
     global card_stats_queue
     card_stats_queue.create_new_card_stats()
+
+
+def init_state(self: Reviewer):
+    global card_stats_queue
+    card_stats_queue.init_state()
 
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
@@ -109,7 +114,9 @@ Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
 
 Reviewer.nextCard = wrap(Reviewer.nextCard, on_next_card, "before")
 
+Reviewer.show = wrap(Reviewer.show, init_state, "before")
+
 
 gui_hooks.card_will_show.append(on_card_will_show)
 gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
-gui_hooks.reviewer_will_end.append(reset_state)
+gui_hooks.reviewer_will_end.append(cleanup)

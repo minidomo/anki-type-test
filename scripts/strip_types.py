@@ -23,12 +23,12 @@ class TypeHintRemover(ast.NodeTransformer):
             return None
         return ast.Assign([node.target], node.value)
 
-    def visit_Import(self, node):
-        node.names = [n for n in node.names if n.name != "typing"]
-        return node if node.names else None
+    # def visit_Import(self, node):
+    #     node.names = [n for n in node.names if n.name != "typing"]
+    #     return node if node.names else None
 
-    def visit_ImportFrom(self, node):
-        return node if node.module != "typing" else None
+    # def visit_ImportFrom(self, node):
+    #     return node if node.module != "typing" else None
 
 
 def remove_types(content: str) -> str:

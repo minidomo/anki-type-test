@@ -1,6 +1,10 @@
+from typing import Any, cast
 from aqt import mw
 
-_config = mw.addonManager.getConfig(__name__)
-assert _config
 
-history_limit = _config["history_limit"]
+def _config():
+    return cast(dict[str, Any], mw.addonManager.getConfig(__name__))
+
+
+def history_limit() -> int:
+    return _config()["history_limit"]

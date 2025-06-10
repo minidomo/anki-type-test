@@ -3,8 +3,13 @@ import shutil
 import os
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--config", action="store_true")
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument(
+    "-c",
+    "--config",
+    help="overwrite the default config file with a given config file",
+    default=argparse.SUPPRESS,
+)
 
 args = parser.parse_args()
 
@@ -26,6 +31,6 @@ with open("config.toml", "rb") as config_data:
 
         if args.config:
             shutil.copyfile(
-                os.path.join(os.getcwd(), "plugin.config.json"),
+                os.path.join(os.getcwd(), args.config),
                 os.path.join(addon_dir, "config.json"),
             )

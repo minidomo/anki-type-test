@@ -75,10 +75,11 @@ class CardStats:
 class CardStatsQueue:
     def __init__(self):
         self.queue: list[CardStats] = []
-        self.history_limit = config.history_limit
+        self.history_limit = config.history_limit()
 
     def create_new_card_stats(self):
-        if len(self.queue) == self.history_limit:
+        # queue has the current card and isn't complete, so -1 when checking length
+        if len(self.queue) - 1 == self.history_limit:
             self.queue.pop(0)
 
         self.queue.append(CardStats())
@@ -93,5 +94,8 @@ class CardStatsQueue:
             return None
         return self.queue[-2]
 
-    def reset(self):
+    def cleanup(self):
         self.queue.clear()
+
+    def init_state(self):
+        self.history_limit = config.history_limit()
