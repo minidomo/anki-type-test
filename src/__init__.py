@@ -5,7 +5,7 @@ from anki.cards import Card
 from datetime import datetime
 from .card_stats import CardStatsQueue, CardStats
 from . import config
-# import re
+import re
 
 card_stats_queue = CardStatsQueue()
 
@@ -117,19 +117,86 @@ old_type_ans_question_filter = Reviewer.typeAnsQuestionFilter
 
 def type_ans_question_filter(self: Reviewer, buf: str) -> str:
     res = old_type_ans_question_filter(self, buf)
-    return res
 
-    # if not self.typeCorrect:
-    #     return res
+    if not self.typeCorrect:
+        return res
 
-    # content = [
-    #     "<div>",
-    #     '<input type=text id=typeans onkeypress="_typeAnsPress();">',
-    #     "<span></span>",
-    #     "</div>",
-    # ]
+    initial_width = "10em"
 
-    # return re.sub(self.typeAnsPat, "\n".join(content), buf)
+    content = f"""
+<style>
+    .type-area {{
+        display: flex;
+        justify-content: center;
+        
+        
+        & span {{
+            position: absolute;
+            left: -1e6px;
+            display: inline-block;
+            min-width: {initial_width};
+        }}
+
+        & * {{
+            font-size: 1em;
+            font-family: inherit;
+            border: 2px solid #666;
+        }}
+    }}
+
+    #typeans {{
+        width: {initial_width};
+        padding: .5em 1em;
+        border-radius: 2em;
+        outline: 0;
+        box-sizing: content-box;
+        text-align: center;
+    }}
+</style>
+
+<div class="type-area">
+    <input type=text id=typeans onkeypress="_typeAnsPress();">
+    <span></span>
+</div>
+
+<script>
+    (() => {{
+        const input = document.querySelector('#typeans');
+        const span = document.querySelector('.type-area > span');
+
+        input.addEventListener('input', function (event) {{
+            span.innerHTML = this.value.replace(/\\\\s/g, '&nbsp;');
+
+            const sStyles = window.getComputedStyle(span);
+            const sWidth = Number.parseInt(sStyles.width);
+
+            const pStyles = window.getComputedStyle(this.parentElement);
+            const pWidth = Number.parseInt(pStyles.width);
+
+            const styles = window.getComputedStyle(this);
+            const exteriorPx = [
+                styles.marginLeft,
+                styles.marginRight,
+                styles.borderLeftWidth,
+                styles.borderRightWidth,
+                styles.paddingLeft,
+                styles.paddingRight,
+            ]
+                .map(e => {{
+                    const pat = /\\\\d+/;
+                    const match = pat.exec(e);
+                    return Number.parseInt(match[0])
+                }})
+                .reduce((prev, cur) => prev + cur, 0)
+
+            const width = Math.min(pWidth - exteriorPx, sWidth);
+            this.style.width = width + 'px';
+        }});
+    }})();
+</script>
+"""
+
+    return re.sub(self.typeAnsPat, content, buf)
 
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
