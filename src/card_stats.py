@@ -19,14 +19,12 @@ class CardStats:
         assert self.correct_answer
         assert self.user_answer
 
-        content = [
-            '<div class="card-stat-entry">',
-            self._generate_html_word(self.correct_answer, self.user_answer),
-            f'<span class="card-stat-duration">({self.duration():.3f})</span>',
-            "</div>",
-        ]
-
-        return "\n".join(content)
+        return f"""
+<div class="card-stat-entry">
+    {self._generate_html_word(self.correct_answer, self.user_answer)}
+    <span class="card-stat-duration">({self.duration():.3f})</span>
+</div>
+"""
 
     def _generate_html_word(self, correct: str, user: str) -> str:
         def determine_color_class(target: str, value: str):

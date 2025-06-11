@@ -54,7 +54,7 @@ with open("build.toml", "rb") as filein:
 
     for filename in python_files:
         with open(filename, "r") as filein:
-            content = "\n".join(filein.readlines())
+            content = "".join(filein.readlines())
 
             with open(filename, "w") as fileout:
                 fileout.write(remove_types(content))

@@ -5,7 +5,7 @@ from anki.cards import Card
 from datetime import datetime
 from .card_stats import CardStatsQueue, CardStats
 from . import config
-import re
+# import re
 
 card_stats_queue = CardStatsQueue()
 
@@ -63,22 +63,27 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
 
     if len(card_stats_queue.queue) > 1:
         history_entries = card_stats_queue.queue[0 : len(card_stats_queue.queue) - 1]
-        html_entries = map(CardStats.html, reversed(history_entries))
+        html_entries_str = "\n".join(map(CardStats.html, reversed(history_entries)))
 
-        content = [
-            "<style>",
-            ".custom-container {display: flex; flex-direction: column; row-gap: 5px; font-size: .7em;}",
-            f".letter-extra {{color: {config.word_stat_color_letter_extra()};}}",
-            f".letter-missing {{color: {config.word_stat_color_letter_missing()};}}",
-            f".letter-correct {{color: {config.word_stat_color_letter_correct()};}}",
-            f".letter-incorrect {{color: {config.word_stat_color_letter_incorrect()};}}",
-            f".card-stat-duration {{color: {config.word_stat_color_duration()};}}",
-            "</style>",
-            '<div class="custom-container">',
-            "\n".join(html_entries),
-            "</div>",
-        ]
-        html_str = "\n".join(content)
+        html_str = f"""
+<style>
+    .custom-container {{
+        display: flex;
+        flex-direction: column;
+        row-gap: 5px;
+        font-size: .7em;
+    }}
+
+    .letter-extra {{ color: {config.word_stat_color_letter_extra()};}}
+    .letter-missing {{ color: {config.word_stat_color_letter_missing()};}}
+    .letter-correct {{ color: {config.word_stat_color_letter_correct()};}}
+    .letter-incorrect {{ color: {config.word_stat_color_letter_incorrect()};}}
+    .card-stat-duration {{ color: {config.word_stat_color_duration()};}}
+</style>
+<div class="custom-container">
+    {html_entries_str}
+</div>
+"""
 
         return f"{text}\n{html_str}"
 
