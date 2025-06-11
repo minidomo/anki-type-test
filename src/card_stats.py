@@ -22,7 +22,7 @@ class CardStats:
         content = [
             '<div class="card-stat-entry">',
             self._generate_html_word(self.correct_answer, self.user_answer),
-            f"<span>({self.duration():.3f})</span>",
+            f'<span class="card-stat-duration">({self.duration():.3f})</span>',
             "</div>",
         ]
 
@@ -30,11 +30,6 @@ class CardStats:
 
     def _generate_html_word(self, correct: str, user: str) -> str:
         def determine_color_class(target: str, value: str):
-            # not typed #7F848E
-            # extra #A2575F
-            # correct #98C379
-            # wrong #E06C75
-
             if len(target) == 0:
                 return "letter-extra"
 
@@ -70,6 +65,9 @@ class CardStats:
             j += 1
 
         return "".join(ret)
+
+    def __str__(self):
+        return f"{{ {self.correct_answer}, {self.user_answer}, {self.duration()} }}"
 
 
 class CardStatsQueue:

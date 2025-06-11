@@ -1,3 +1,8 @@
 {
-    "stat_display_limit": 10
+    "stat_display_limit": 10,
+    "word_stat.color.letter_correct": "#98C379",
+    "word_stat.color.letter_incorrect": "#E06C75",
+    "word_stat.color.letter_missing": "#7F848E",
+    "word_stat.color.letter_extra": "#A2575F",
+    "word_stat.color.duration": "#646669"
 }

@@ -3,12 +3,11 @@ import shutil
 import os
 import argparse
 
-parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser()
 parser.add_argument(
     "-c",
     "--config",
     help="overwrite the default config file with a given config file",
-    default=argparse.SUPPRESS,
 )
 
 args = parser.parse_args()

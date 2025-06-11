@@ -3,6 +3,21 @@
     "properties": {
         "stat_display_limit": {
             "type": "number"
+        },
+        "word_stat.color.letter_correct": {
+            "type": "string"
+        },
+        "word_stat.color.letter_incorrect": {
+            "type": "string"
+        },
+        "word_stat.color.letter_missing": {
+            "type": "string"
+        },
+        "word_stat.color.letter_extra": {
+            "type": "string"
+        },
+        "word_stat.color.duration": {
+            "type": "string"
         }
     }
 }

@@ -4,6 +4,8 @@ from aqt import gui_hooks
 from anki.cards import Card
 from datetime import datetime
 from .card_stats import CardStatsQueue, CardStats
+from . import config
+import re
 
 card_stats_queue = CardStatsQueue()
 
@@ -65,11 +67,12 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
 
         content = [
             "<style>",
-            ".custom-container {display: flex; flex-direction: column; row-gap: 5px; font-size: 14px;}",
-            ".letter-extra {color: #A2575F;}",
-            ".letter-missing {color: #7F848E;}",
-            ".letter-correct {color: #98C379;}",
-            ".letter-incorrect {color: #E06C75;}",
+            ".custom-container {display: flex; flex-direction: column; row-gap: 5px; font-size: .7em;}",
+            f".letter-extra {{color: {config.word_stat_color_letter_extra()};}}",
+            f".letter-missing {{color: {config.word_stat_color_letter_missing()};}}",
+            f".letter-correct {{color: {config.word_stat_color_letter_correct()};}}",
+            f".letter-incorrect {{color: {config.word_stat_color_letter_incorrect()};}}",
+            f".card-stat-duration {{color: {config.word_stat_color_duration()};}}",
             "</style>",
             '<div class="custom-container">',
             "\n".join(html_entries),
@@ -77,7 +80,7 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
         ]
         html_str = "\n".join(content)
 
-        return f"{text}\n<br>\n{html_str}"
+        return f"{text}\n{html_str}"
 
     return text
 
@@ -104,6 +107,26 @@ def init_state(self: Reviewer):
     pass
 
 
+old_type_ans_question_filter = Reviewer.typeAnsQuestionFilter
+
+
+def type_ans_question_filter(self: Reviewer, buf: str) -> str:
+    res = old_type_ans_question_filter(self, buf)
+    return res
+
+    # if not self.typeCorrect:
+    #     return res
+
+    # content = [
+    #     "<div>",
+    #     '<input type=text id=typeans onkeypress="_typeAnsPress();">',
+    #     "<span></span>",
+    #     "</div>",
+    # ]
+
+    # return re.sub(self.typeAnsPat, "\n".join(content), buf)
+
+
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
 Reviewer._onTypedAnswer = on_typed_answer
@@ -114,6 +137,8 @@ Reviewer._showAnswer = wrap(Reviewer._showAnswer, move_to_next_card)
 Reviewer.nextCard = wrap(Reviewer.nextCard, on_next_card, "before")
 
 Reviewer.show = wrap(Reviewer.show, init_state, "before")
+
+Reviewer.typeAnsQuestionFilter = type_ans_question_filter
 
 
 gui_hooks.card_will_show.append(on_card_will_show)
