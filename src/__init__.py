@@ -1,5 +1,7 @@
 from aqt.reviewer import Reviewer
 from anki.hooks import wrap
+from aqt.main import MainWindowState
+from aqt.webview import AnkiWebView
 from aqt import gui_hooks
 from anki.cards import Card
 from datetime import datetime
@@ -8,6 +10,7 @@ from . import config
 import re
 
 card_stats_queue = CardStatsQueue()
+finished_review = False
 
 
 def strip(val: str | None):
@@ -199,6 +202,36 @@ def type_ans_question_filter(self: Reviewer, buf: str) -> str:
     return re.sub(self.typeAnsPat, content, buf)
 
 
+def state_change(new_state: MainWindowState, old_state: MainWindowState):
+    global finished_review
+    finished_review = old_state == "review" and new_state == "overview"
+
+
+def post_webview_inject_style(webview: AnkiWebView):
+    global finished_review
+
+    print(f"post webview inject style: {finished_review}")
+
+    if not finished_review:
+        return
+
+    review_main_id = "post-review-main"
+
+    js = f"""
+(() => {{
+    if (document.getElementById("{review_main_id}")) return;
+
+    document.querySelector("body > div").insertAdjacentHTML("afterend", `
+        <div id="{review_main_id}">
+            some test text
+        </div>
+    `);
+}})();
+"""
+
+    webview.eval(js)
+
+
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
 Reviewer._onTypedAnswer = on_typed_answer
@@ -216,3 +249,5 @@ Reviewer.typeAnsQuestionFilter = type_ans_question_filter
 gui_hooks.card_will_show.append(on_card_will_show)
 gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
 gui_hooks.reviewer_will_end.append(cleanup)
+gui_hooks.state_did_change.append(state_change)
+gui_hooks.webview_did_inject_style_into_page.append(post_webview_inject_style)
