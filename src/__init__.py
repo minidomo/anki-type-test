@@ -4,7 +4,7 @@ from aqt.main import MainWindowState
 from aqt.webview import AnkiWebView
 from aqt import gui_hooks
 from anki.cards import Card
-from datetime import datetime
+from timeit import default_timer as timer
 from .card_stats import CardStats
 from .review_stats import ReviewStats
 from . import config
@@ -35,7 +35,7 @@ def default_ease(self: Reviewer):
 
 
 def on_typed_answer(self: Reviewer, val: str | None):
-    time = datetime.now()
+    time = timer()
 
     self.typedAnswer = strip(val) or ""
 
@@ -61,6 +61,7 @@ def store_answers(self: Reviewer):
     review_stats_data.active_card.correct_answer = strip(self.typeCorrect)
     review_stats_data.active_card.user_answer = strip(self.typedAnswer)
 
+    print(review_stats_data.active_card)
     review_stats_data.finish_active_card()
 
 
@@ -101,7 +102,7 @@ def on_card_will_show(text: str, card: Card, kind: str) -> str:
 
 
 def on_reviewer_did_show_question(card: Card):
-    time = datetime.now()
+    time = timer()
 
     global review_stats_data
     assert review_stats_data
@@ -111,7 +112,8 @@ def on_reviewer_did_show_question(card: Card):
 
 
 def cleanup():
-    pass
+    global review_stats_data
+    print(review_stats_data)
 
 
 def on_next_card(self: Reviewer):
@@ -121,6 +123,9 @@ def on_next_card(self: Reviewer):
     global review_stats_data
     assert review_stats_data
     review_stats_data.prepare_new_active_card()
+
+    assert review_stats_data.active_card
+    review_stats_data.active_card.card_id = self.card.id
 
 
 def init_state(self: Reviewer):
