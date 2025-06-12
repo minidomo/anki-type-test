@@ -1,5 +1,4 @@
 from datetime import datetime
-from . import config
 
 
 class CardStats:
@@ -66,28 +65,3 @@ class CardStats:
 
     def __str__(self):
         return f"{{ {self.correct_answer}, {self.user_answer}, {self.duration()} }}"
-
-
-class CardStatsQueue:
-    def __init__(self):
-        self.queue: list[CardStats] = []
-
-    def create_new_card_stats(self):
-        # queue has the current card and isn't complete, so -1 when checking length
-        while len(self.queue) - 1 >= config.stat_display_limit():
-            self.queue.pop(0)
-
-        self.queue.append(CardStats())
-
-    def current(self):
-        if len(self.queue) == 0:
-            return None
-        return self.queue[-1]
-
-    def previous(self):
-        if len(self.queue) <= 1:
-            return None
-        return self.queue[-2]
-
-    def cleanup(self):
-        self.queue.clear()
