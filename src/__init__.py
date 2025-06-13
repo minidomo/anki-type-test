@@ -176,7 +176,7 @@ def type_ans_question_filter(self: Reviewer, buf: str) -> str:
 </style>
 
 <div class="type-area">
-    <input type=text id=typeans onkeypress="_typeAnsPress();">
+    <input type=text id="typeans" onkeypress="_typeAnsPress();">
     <span></span>
 </div>
 
