@@ -1,5 +1,6 @@
 from .card_stats import CardStats
 from statistics import median, mean
+from datetime import timedelta
 
 
 class ReviewStats:
@@ -53,7 +54,7 @@ total attempts: {self.total_attempts()}
 correct: {self.correct_attempts()}
 incorrect: {self.incorrect_attempts()}
 accuracy: {self.card_accuracy():.3f}%
-total time: {self.total_time():.3f}
+total time: {timedelta(seconds=self.total_time())}
 average time: {self.average_time():.3f}
 median time: {self.median_time():.3f}
 """

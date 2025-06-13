@@ -1,8 +1,8 @@
 from aqt.reviewer import Reviewer
 from anki.hooks import wrap
 from aqt.main import MainWindowState
-from aqt.webview import AnkiWebView
-from aqt import gui_hooks
+from aqt.webview import AnkiWebView, WebContent
+from aqt import gui_hooks, mw
 from anki.cards import Card
 from timeit import default_timer as timer
 from .card_stats import CardStats
@@ -248,6 +248,13 @@ def post_webview_inject_style(webview: AnkiWebView):
     webview.eval(js)
 
 
+def on_webview_will_set_content(web_content: WebContent, context: object | None):
+    addon_package = mw.addonManager.addonFromModule(__name__)
+    web_content.css.append(f"/_addons/{addon_package}/web/balloon.min.css")
+
+
+mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
+
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
 Reviewer._onTypedAnswer = on_typed_answer
@@ -267,3 +274,4 @@ gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
 gui_hooks.reviewer_will_end.append(cleanup)
 gui_hooks.state_did_change.append(state_change)
 gui_hooks.webview_did_inject_style_into_page.append(post_webview_inject_style)
+gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
