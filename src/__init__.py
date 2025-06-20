@@ -1,13 +1,14 @@
 from aqt.reviewer import Reviewer
 from anki.hooks import wrap
 from aqt.main import MainWindowState
-from aqt.webview import AnkiWebView, WebContent
-from aqt import gui_hooks, mw
+from aqt.webview import AnkiWebView
+from aqt import gui_hooks
 from anki.cards import Card
 from timeit import default_timer as timer
 from .card_stats import CardStats
 from .review_stats import ReviewStats
 from . import config
+from . import web_exports
 import re
 
 post_review = False
@@ -236,10 +237,75 @@ def post_webview_inject_style(webview: AnkiWebView):
     js = f"""
 (() => {{
     if (document.getElementById("{review_main_id}")) return;
-
+    
     document.querySelector("body > div").insertAdjacentHTML("afterend", `
+        <style>
+
+            #{review_main_id} {{
+                padding: 3rem;
+            }}
+
+            .container {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+                grid-auto-rows: 1fr;
+                gap: .5rem;
+            }}
+
+            .group {{
+                width: fit-content;
+                height: fit-content;
+            }}
+
+            .top {{
+                cursor: default;
+            }}
+
+            .bottom {{
+                font-size: 2rem;
+                line-height: 2rem;
+                width: fit-content;
+            }}
+
+            .bottom::after {{
+                line-height: normal;
+            }}
+
+            .cardtime>.bottom,
+            .top {{
+                font-size: 1rem;
+                line-height: 1rem;
+            }}
+
+            .cardtime>.bottom {{
+                line-height: 1.25rem;
+            }}
+        </style>
+
+        
         <div id="{review_main_id}">
-            some test text
+            <div class="container">
+                <div class="group">
+                    <div class="top">time</div>
+                    <div class="bottom" aria-label="1:34.453" data-balloon-pos="up">01:34</div>
+                </div>
+                <div class="group">
+                    <div class="top">acc</div>
+                    <div class="bottom" aria-label="90.909%
+24 correct
+6 incorrect" data-balloon-break data-balloon-pos="up">91%</div>
+                </div>
+                <div class="group">
+                    <div class="top">cards</div>
+                    <div class="bottom" aria-label="correct
+incorrect" data-balloon-break data-balloon-pos="up">24/6</div>
+                </div>
+                <div class="group cardtime">
+                    <div class="top">card time</div>
+                    <div class="bottom" aria-label="1.229s mean
+1.213s median" data-balloon-break data-balloon-pos="up">1.2s<br>1.2s</div>
+                </div>
+            </div>
         </div>
     `);
 }})();
@@ -248,12 +314,7 @@ def post_webview_inject_style(webview: AnkiWebView):
     webview.eval(js)
 
 
-def on_webview_will_set_content(web_content: WebContent, context: object | None):
-    addon_package = mw.addonManager.addonFromModule(__name__)
-    web_content.css.append(f"/_addons/{addon_package}/web/balloon.min.css")
-
-
-mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
+web_exports.init_web_exports(r"web/.*(css|js)", css=["web/balloon.min.css"])
 
 Reviewer._defaultEase = wrap(Reviewer._defaultEase, default_ease)
 
@@ -274,4 +335,3 @@ gui_hooks.reviewer_did_show_question.append(on_reviewer_did_show_question)
 gui_hooks.reviewer_will_end.append(cleanup)
 gui_hooks.state_did_change.append(state_change)
 gui_hooks.webview_did_inject_style_into_page.append(post_webview_inject_style)
-gui_hooks.webview_will_set_content.append(on_webview_will_set_content)
