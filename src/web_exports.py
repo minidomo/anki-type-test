@@ -1,5 +1,6 @@
 from aqt import mw, gui_hooks
 from aqt.webview import AnkiWebView, WebContent
+from . import javascript
 
 _js: list[str] = []
 _css: list[str] = []
@@ -19,12 +20,12 @@ def js_insert_web_exports():
     js_code = []
 
     if len(js):
-        html = "\n".join(map(lambda e: mw.web.bundledScript(e), js))
-        js_code.append(f"document.body.insertAdjacentHTML('afterend', '{html}');")
+        html = "\n".join(map(mw.web.bundledScript, js))
+        js_code.append(javascript.insert_html("body", "beforeend", html))
 
     if len(css):
-        html = "\n".join(map(lambda e: mw.web.bundledCSS(e), css))
-        js_code.append(f"document.body.insertAdjacentHTML('afterend', '{html}');")
+        html = "\n".join(map(mw.web.bundledCSS, css))
+        js_code.append(javascript.insert_html("head", "beforeend", html))
 
     return "\n".join(js_code)
 
@@ -49,11 +50,7 @@ def _on_webview_will_set_content(web_content: WebContent, context: object | None
 
 
 def _on_webview_did_inject_style_into_page(webview: AnkiWebView):
-    js = f"""
-(() => {{
-    if (window._injected_web_exports) return;
-    window._injected_web_exports = true;
-    {js_insert_web_exports()}
-}})();
-"""
+    js = javascript.func_wrap(
+        f"{javascript.ensure_run_once('inject-web-exports')} {js_insert_web_exports()}"
+    )
     webview.eval(js)

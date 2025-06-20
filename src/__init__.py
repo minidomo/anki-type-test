@@ -9,6 +9,7 @@ from .card_stats import CardStats
 from .review_stats import ReviewStats
 from . import config
 from . import web_exports
+from . import javascript
 import re
 
 post_review = False
@@ -234,82 +235,79 @@ def post_webview_inject_style(webview: AnkiWebView):
 
     review_main_id = "post-review-main"
 
-    js = f"""
-(() => {{
-    if (document.getElementById("{review_main_id}")) return;
-    
-    document.querySelector("body > div").insertAdjacentHTML("afterend", `
-        <style>
+    html = f"""
+<style>
+    #{review_main_id} {{
+        padding: 3rem;
+    }}
 
-            #{review_main_id} {{
-                padding: 3rem;
-            }}
+    .container {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        grid-auto-rows: 1fr;
+        gap: .5rem;
+    }}
 
-            .container {{
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-                grid-auto-rows: 1fr;
-                gap: .5rem;
-            }}
+    .group {{
+        width: fit-content;
+        height: fit-content;
+    }}
 
-            .group {{
-                width: fit-content;
-                height: fit-content;
-            }}
+    .top {{
+        cursor: default;
+    }}
 
-            .top {{
-                cursor: default;
-            }}
+    .bottom {{
+        font-size: 2rem;
+        line-height: 2rem;
+        width: fit-content;
+    }}
 
-            .bottom {{
-                font-size: 2rem;
-                line-height: 2rem;
-                width: fit-content;
-            }}
+    .bottom::after {{
+        line-height: normal;
+    }}
 
-            .bottom::after {{
-                line-height: normal;
-            }}
+    .cardtime>.bottom,
+    .top {{
+        font-size: 1rem;
+        line-height: 1rem;
+    }}
 
-            .cardtime>.bottom,
-            .top {{
-                font-size: 1rem;
-                line-height: 1rem;
-            }}
+    .cardtime>.bottom {{
+        line-height: 1.25rem;
+    }}
+</style>
 
-            .cardtime>.bottom {{
-                line-height: 1.25rem;
-            }}
-        </style>
 
-        
-        <div id="{review_main_id}">
-            <div class="container">
-                <div class="group">
-                    <div class="top">time</div>
-                    <div class="bottom" aria-label="1:34.453" data-balloon-pos="up">01:34</div>
-                </div>
-                <div class="group">
-                    <div class="top">acc</div>
-                    <div class="bottom" aria-label="90.909%
+<div id="{review_main_id}">
+    <div class="container">
+        <div class="group">
+            <div class="top">time</div>
+            <div class="bottom" aria-label="1:34.453" data-balloon-pos="up">01:34</div>
+        </div>
+        <div class="group">
+            <div class="top">acc</div>
+            <div class="bottom" aria-label="90.909%
 24 correct
 6 incorrect" data-balloon-break data-balloon-pos="up">91%</div>
-                </div>
-                <div class="group">
-                    <div class="top">cards</div>
-                    <div class="bottom" aria-label="correct
-incorrect" data-balloon-break data-balloon-pos="up">24/6</div>
-                </div>
-                <div class="group cardtime">
-                    <div class="top">card time</div>
-                    <div class="bottom" aria-label="1.229s mean
-1.213s median" data-balloon-break data-balloon-pos="up">1.2s<br>1.2s</div>
-                </div>
-            </div>
         </div>
-    `);
-}})();
+        <div class="group">
+            <div class="top">cards</div>
+            <div class="bottom" aria-label="correct
+incorrect" data-balloon-break data-balloon-pos="up">24/6</div>
+        </div>
+        <div class="group cardtime">
+            <div class="top">card time</div>
+            <div class="bottom" aria-label="1.229s mean
+1.213s median" data-balloon-break data-balloon-pos="up">1.2s<br>1.2s</div>
+        </div>
+    </div>
+</div>
 """
+
+    js = javascript.func_wrap(
+        f"{javascript.ensure_run_once('post-review')} {javascript.insert_html('body', 'beforeend', html)}"
+    )
 
     webview.eval(js)
 

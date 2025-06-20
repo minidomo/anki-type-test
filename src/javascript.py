@@ -1,6 +1,6 @@
 from typing import Literal
 
-type Position = Literal["beforebegin", "afterbegin", "beforeend", "afterend"]
+Position = Literal["beforebegin", "afterbegin", "beforeend", "afterend"]
 
 
 def func_wrap(js: str):
@@ -12,11 +12,11 @@ def async_func_wrap(js: str):
 
 
 def insert_html(selector: str, position: Position, html: str):
-    return f"document.querySelector({selector}).insertAdjacentHTML('{position}', '{html}');"
+    return f"document.querySelector('{selector}').insertAdjacentHTML('{position}', `{html}`);"
 
 
 def ensure_run_once(id: str):
     return f"""
-if (window[_{id}]) return;
-window[_{id}] = true;
+if (window["_{id}"]) return;
+window["_{id}"] = true;
 """
