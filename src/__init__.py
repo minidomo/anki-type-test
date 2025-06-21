@@ -246,10 +246,13 @@ def post_webview_inject_style(webview: AnkiWebView):
     html = f"""
 <style>
     #{review_main_id} {{
-        padding: 3rem;
+        display: grid;
+        grid-template-columns: minmax(3rem, auto) minmax(10rem, 800px) minmax(3rem, auto);
+        grid-template-areas: ". content .";
     }}
 
     .container {{
+        grid-area: content;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
         grid-auto-rows: 1fr;
