@@ -1,19 +1,42 @@
-from datetime import datetime
-from . import config
-
-
 class CardStats:
     def __init__(self):
+        self.card_id: int = -1
         self.correct_answer: str | None = None
         self.user_answer: str | None = None
-        self.start_time: datetime | None = None
-        self.end_time: datetime | None = None
+        self.start_time: float | None = None
+        self.end_time: float | None = None
+
+    def is_user_correct(self):
+        return self.user_answer == self.correct_answer
 
     def duration(self) -> float:
         if self.end_time is None or self.start_time is None:
             return 0
         delta = self.end_time - self.start_time
-        return delta.total_seconds()
+        return delta
+
+    def correct_characters(self):
+        i = 0
+        j = 0
+        correct_chars = 0
+
+        assert self.correct_answer
+        assert self.user_answer
+
+        while i < len(self.correct_answer) and j < len(self.user_answer):
+            if self.correct_answer[i] == self.user_answer[j]:
+                correct_chars += 1
+            i += 1
+            j += 1
+
+        return correct_chars
+
+    def wpm(self):
+        return (self.correct_characters() * 60 / self.duration()) / 5
+
+    def accuracy(self):
+        assert self.user_answer
+        return self.correct_characters() / len(self.user_answer) * 100
 
     def html(self):
         assert self.correct_answer
@@ -65,29 +88,4 @@ class CardStats:
         return "".join(ret)
 
     def __str__(self):
-        return f"{{ {self.correct_answer}, {self.user_answer}, {self.duration()} }}"
-
-
-class CardStatsQueue:
-    def __init__(self):
-        self.queue: list[CardStats] = []
-
-    def create_new_card_stats(self):
-        # queue has the current card and isn't complete, so -1 when checking length
-        while len(self.queue) - 1 >= config.stat_display_limit():
-            self.queue.pop(0)
-
-        self.queue.append(CardStats())
-
-    def current(self):
-        if len(self.queue) == 0:
-            return None
-        return self.queue[-1]
-
-    def previous(self):
-        if len(self.queue) <= 1:
-            return None
-        return self.queue[-2]
-
-    def cleanup(self):
-        self.queue.clear()
+        return f"{{ {self.card_id}, {self.correct_answer}, {self.user_answer}, {self.duration():.3f}, {self.wpm():.3f}, {self.accuracy():.3f} }}"
