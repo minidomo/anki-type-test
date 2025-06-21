@@ -7,6 +7,7 @@ from anki.cards import Card
 from timeit import default_timer as timer
 from .card_stats import CardStats
 from .review_stats import ReviewStats
+from .format import format_short_time
 from . import config
 from . import web_exports
 from . import javascript
@@ -228,12 +229,19 @@ def state_change(new_state: MainWindowState, old_state: MainWindowState):
 
 
 def post_webview_inject_style(webview: AnkiWebView):
-    global post_review
+    global post_review, review_stats_data
+    assert review_stats_data
 
     if not post_review:
         return
 
     review_main_id = "post-review-main"
+    total_time = review_stats_data.total_time()
+    average_time = review_stats_data.average_time()
+    median_time = review_stats_data.median_time()
+    correct_attempts = review_stats_data.correct_attempts()
+    incorrect_attempts = review_stats_data.incorrect_attempts()
+    card_accuracy = review_stats_data.card_accuracy()
 
     html = f"""
 <style>
@@ -283,23 +291,23 @@ def post_webview_inject_style(webview: AnkiWebView):
     <div class="container">
         <div class="group">
             <div class="top">time</div>
-            <div class="bottom" aria-label="1:34.453" data-balloon-pos="up">01:34</div>
+            <div class="bottom" aria-label="{format_short_time(total_time, decimals=3)}" data-balloon-pos="up">{format_short_time(total_time, decimals=0)}</div>
         </div>
         <div class="group">
             <div class="top">acc</div>
-            <div class="bottom" aria-label="90.909%
-24 correct
-6 incorrect" data-balloon-break data-balloon-pos="up">91%</div>
+            <div class="bottom" aria-label="{round(card_accuracy, 3)}%
+{correct_attempts} correct
+{incorrect_attempts} incorrect" data-balloon-break data-balloon-pos="up">{round(card_accuracy)}%</div>
         </div>
         <div class="group">
             <div class="top">cards</div>
             <div class="bottom" aria-label="correct
-incorrect" data-balloon-break data-balloon-pos="up">24/6</div>
+incorrect" data-balloon-break data-balloon-pos="up">{correct_attempts}/{incorrect_attempts}</div>
         </div>
         <div class="group cardtime">
             <div class="top">card time</div>
-            <div class="bottom" aria-label="1.229s mean
-1.213s median" data-balloon-break data-balloon-pos="up">1.2s<br>1.2s</div>
+            <div class="bottom" aria-label="{format_short_time(average_time, decimals=3)} average
+{format_short_time(median_time, decimals=3)} median" data-balloon-break data-balloon-pos="up">{format_short_time(average_time, decimals=0, decimals_if_only_seconds=1)}<br>{format_short_time(median_time, decimals=0, decimals_if_only_seconds=1)}</div>
         </div>
     </div>
 </div>

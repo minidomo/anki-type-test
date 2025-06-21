@@ -33,6 +33,8 @@ class ReviewStats:
         return filter(lambda card: not card.is_user_correct(), self.cards)
 
     def card_accuracy(self):
+        if self.total_attempts() == 0:
+            return 100
         return self.correct_attempts() / self.total_attempts() * 100
 
     def get_displayed_cards(self, limit: int) -> list[CardStats]:
