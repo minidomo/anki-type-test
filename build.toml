@@ -1,4 +1,4 @@
-addon_name = "anki-type-test"
+addon_name = "typekey"
 src = "src"
 dest = "dist"
 
@@ -6,5 +6,5 @@ dest = "dist"
 dest = "out"
 
 [manifest]
-package = "anki-type-test"
-name = "anki-type-test"
+package = "typekey"
+name = "typekey"
