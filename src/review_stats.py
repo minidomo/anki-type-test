@@ -12,9 +12,13 @@ class ReviewStats:
         return sum(map(CardStats.duration, self.cards))
 
     def average_time(self):
+        if self.total_attempts() == 0:
+            return 1
         return mean(map(CardStats.duration, self.cards))
 
     def median_time(self):
+        if self.total_attempts() == 0:
+            return 1
         return median(sorted(map(CardStats.duration, self.cards)))
 
     def total_attempts(self):
@@ -34,7 +38,7 @@ class ReviewStats:
 
     def card_accuracy(self):
         if self.total_attempts() == 0:
-            return 100
+            return 1
         return self.correct_attempts() / self.total_attempts() * 100
 
     def get_displayed_cards(self, limit: int) -> list[CardStats]:
